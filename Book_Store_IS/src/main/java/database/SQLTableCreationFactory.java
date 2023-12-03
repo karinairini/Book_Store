@@ -10,7 +10,7 @@ public class SQLTableCreationFactory {
                     "  author varchar(500) NOT NULL," +
                     "  title varchar(500) NOT NULL," +
                     "  publishedDate datetime DEFAULT NULL," +
-                    "  price double(5, 2) DEFAULT NULL," +
+                    "  price real(5, 2) DEFAULT NULL," +
                     "  stock int DEFAULT NULL," +
                     "  PRIMARY KEY (id)," +
                     "  UNIQUE KEY id_UNIQUE (id)" +
@@ -77,7 +77,7 @@ public class SQLTableCreationFactory {
                     "  customer_id INT NOT NULL," +
                     "  book_id INT NOT NULL," +
                     "  quantity INT NOT NULL," +
-                    "  price INT NOT NULL," +
+                    "  price real(5, 2) NOT NULL," +
                     "  PRIMARY KEY (id)," +
                     "  UNIQUE INDEX id_UNIQUE (id ASC)," +
                     "  INDEX customer_id_idx (customer_id ASC)," +
