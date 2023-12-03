@@ -48,8 +48,8 @@ public class LoginController {
                         .toList();
                 if (roles.contains(Constants.Roles.ADMINISTRATOR)) {
                     loginView.getLoginStage().close();
-                    AdministratorView administratorView = new AdministratorView(new Stage(), componentFactory);
-                    AdministratorController administratorController = new AdministratorController(administratorView, componentFactory, loginNotification.getResult());
+                    AdministratorView administratorView = new AdministratorView(new Stage());
+                    AdministratorController administratorController = new AdministratorController(administratorView, componentFactory);
                 } else if (roles.contains(Constants.Roles.EMPLOYEE) && roles.contains(Constants.Roles.CUSTOMER)) {
 
                     List<String> choices = Arrays.asList("Employee", "Customer");

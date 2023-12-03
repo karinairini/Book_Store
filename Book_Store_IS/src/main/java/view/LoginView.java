@@ -19,8 +19,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class LoginView {
-    private Stage loginStage;
-    private GridPane gridPane;
+    private final Stage loginStage;
+    private final GridPane gridPane;
     private TextField userTextField;
     private PasswordField passwordField;
     private Button signInButton;

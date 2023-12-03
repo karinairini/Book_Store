@@ -9,11 +9,6 @@ import repository.security.RightsRolesRepository;
 import repository.user.UserRepository;
 import service.security.PasswordGenerator;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.Collections;
 
 import static database.Constants.Roles.*;
@@ -30,7 +25,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public Notification<Boolean> register(String username, String password) {
         Notification<Boolean> userRegisterNotification = new Notification<>();
-        Role employeeRole = rightsRolesRepository.findRoleByTitle(ADMINISTRATOR);
+        Role employeeRole = rightsRolesRepository.findRoleByTitle(CUSTOMER);
 
         User user = new UserBuilder()
                 .setUsername(username)

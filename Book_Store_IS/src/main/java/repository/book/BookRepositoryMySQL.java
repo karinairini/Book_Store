@@ -2,10 +2,8 @@ package repository.book;
 
 import model.Book;
 import model.builder.BookBuilder;
-import model.validator.Notification;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -109,6 +107,7 @@ public class BookRepositoryMySQL implements BookRepository {
                 PreparedStatement preparedStatement = connection.prepareStatement(sqlRemove);
                 preparedStatement.setInt(1, book.getStock());
                 preparedStatement.setLong(2, book.getId());
+
                 int rowsUpdated = preparedStatement.executeUpdate();
                 return rowsUpdated == 1;
             } else {
@@ -119,6 +118,7 @@ public class BookRepositoryMySQL implements BookRepository {
                 preparedStatement.setDouble(4, book.getPrice());
                 preparedStatement.setInt(5, book.getStock());
                 preparedStatement.setLong(6, book.getId());
+
                 int rowsUpdated = preparedStatement.executeUpdate();
                 return rowsUpdated == 1;
             }

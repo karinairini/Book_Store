@@ -1,7 +1,6 @@
 package service.book;
 
 import model.Book;
-import model.validator.Notification;
 
 import java.util.List;
 import java.util.Optional;

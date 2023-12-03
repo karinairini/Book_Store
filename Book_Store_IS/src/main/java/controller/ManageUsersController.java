@@ -12,7 +12,7 @@ import view.ManageUsersView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 public class ManageUsersController {
     private final ManageUsersView manageUsersViewScene;
@@ -33,11 +33,11 @@ public class ManageUsersController {
         List<Role> roles = new ArrayList<>();
 
         if (manageUsersViewScene.getRolesComboBox() != null && manageUsersViewScene.getRolesComboBox().getValue() != null && !manageUsersViewScene.getRolesComboBox().getValue().equals("")) {
-            roles.add(componentFactory.getRightsRolesRepository().findRoleByTitle(manageUsersViewScene.getRolesComboBox().getValue()));
+            roles.add(componentFactory.getRightsRolesService().findRoleByTitle(manageUsersViewScene.getRolesComboBox().getValue()));
         }
 
         if (manageUsersViewScene.getAdditionalRolesComboBox() != null && manageUsersViewScene.getAdditionalRolesComboBox().getValue() != null && !manageUsersViewScene.getAdditionalRolesComboBox().getValue().equals("")) {
-            roles.add(componentFactory.getRightsRolesRepository().findRoleByTitle(manageUsersViewScene.getAdditionalRolesComboBox().getValue()));
+            roles.add(componentFactory.getRightsRolesService().findRoleByTitle(manageUsersViewScene.getAdditionalRolesComboBox().getValue()));
         }
         return roles;
     }
@@ -57,12 +57,9 @@ public class ManageUsersController {
                 manageUsersViewScene.setActionTargetText("Register successful!");
             }
 
-            User user = componentFactory.getUserService().findByUsername(username).orElse(null);
-            if (user != null) {
-                componentFactory.getRightsRolesRepository().addRolesToUser(user, roles);
-            }
+            componentFactory.getUserService().findByUsername(username).ifPresent(user -> componentFactory.getRightsRolesService().addRolesToUser(user, roles));
             manageUsersViewScene.addRecordsToTable();
-
+            manageUsersViewScene.clearFields();
         }
     }
 
@@ -76,6 +73,7 @@ public class ManageUsersController {
 
             manageUsersViewScene.setActionTargetText("Deleted user successfully!");
             manageUsersViewScene.addRecordsToTable();
+            manageUsersViewScene.clearFields();
         }
     }
 
@@ -84,7 +82,6 @@ public class ManageUsersController {
         @Override
         public void handle(ActionEvent event) {
             String password = manageUsersViewScene.getPasswordTextField().getText();
-            Long id = Long.parseLong(manageUsersViewScene.getIdTextField().getText());
             User user = manageUsersViewScene.getSelectedUser();
 
             user.setPassword(password);
@@ -104,6 +101,7 @@ public class ManageUsersController {
                     manageUsersViewScene.setActionTargetText("Updated password successfully!");
                 }
                 manageUsersViewScene.addRecordsToTable();
+                manageUsersViewScene.clearFields();
             }
         }
     }
@@ -134,6 +132,7 @@ public class ManageUsersController {
                 }
             }
             manageUsersViewScene.addRecordsToTable();
+            manageUsersViewScene.clearFields();
         }
     }
 

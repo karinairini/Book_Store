@@ -28,13 +28,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EmployeeView {
-    private Stage employeeStage;
-    private ComponentFactory componentFactory;
-    private GridPane gridPane;
+    private final Stage employeeStage;
+    private final ComponentFactory componentFactory;
+    private final GridPane gridPane;
     private TableView<Book> bookTable;
     private Button addBookToLibraryButton;
     private Button addOrderButton;
-    private Button viewOrdersButton;
+    private Button viewActivityButton;
     private Button deleteBookFromLibrary;
     private Button updateBookButton;
     private Button logOutButton;
@@ -84,33 +84,13 @@ public class EmployeeView {
     }
 
     private void initializeTable() {
-        TableColumn<Book, String> idBook = new TableColumn<>("ID");
-        idBook.setMinWidth(40);
-        idBook.setCellValueFactory(new PropertyValueFactory<>("id"));
-
-        TableColumn<Book, String> authorBook = new TableColumn<>("Author");
-        authorBook.setMinWidth(200);
-        authorBook.setCellValueFactory(new PropertyValueFactory<>("author"));
-
-        TableColumn<Book, String> titleBook = new TableColumn<>("Title");
-        titleBook.setMinWidth(200);
-        titleBook.setCellValueFactory(new PropertyValueFactory<>("title"));
-
-        TableColumn<Book, LocalDate> publishedDateBook = new TableColumn<>("Published Date");
-        publishedDateBook.setMinWidth(200);
-        publishedDateBook.setCellValueFactory(new PropertyValueFactory<>("publishedDate"));
-
-        TableColumn<Book, Double> priceBook = new TableColumn<>("Price");
-        priceBook.setMinWidth(125);
-        priceBook.setCellValueFactory(new PropertyValueFactory<>("price"));
-
-        TableColumn<Book, Integer> stockBook = new TableColumn<>("Stock");
-        stockBook.setMinWidth(100);
-        stockBook.setCellValueFactory(new PropertyValueFactory<>("stock"));
-
-        TableColumn<Book, Integer> ageOfBook = new TableColumn<>("Age");
-        ageOfBook.setMinWidth(40);
-        ageOfBook.setCellValueFactory(new PropertyValueFactory<>("age"));
+        TableColumn<Book, String> idBook = createTableColumn("ID", 40, "id");
+        TableColumn<Book, String> authorBook = createTableColumn("Author", 200, "author");
+        TableColumn<Book, String> titleBook = createTableColumn("Title", 200, "title");
+        TableColumn<Book, LocalDate> publishedDateBook = createTableColumn("Published Date", 200, "publishedDate");
+        TableColumn<Book, Double> priceBook = createTableColumn("Price", 125, "price");
+        TableColumn<Book, Integer> stockBook = createTableColumn("Stock", 100, "stock");
+        TableColumn<Book, Integer> ageOfBook = createTableColumn("Age", 40, "age");
 
         bookTable = new TableView<>();
         addRecordsToTable();
@@ -118,55 +98,35 @@ public class EmployeeView {
         gridPane.add(bookTable, 0, 2, 2, 4);
 
         bookTable.setOnMouseClicked((MouseEvent event) -> {
-            Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
+            Book selectedBook = getSelectedBook();
             if (selectedBook != null) {
-                bookTitleTextField.setText(selectedBook.getTitle());
-                bookAuthorTextField.setText(selectedBook.getAuthor());
-                bookPublishedDateTextField.setText(String.valueOf(selectedBook.getPublishedDate()));
-                bookPriceTextField.setText(String.valueOf(selectedBook.getPrice()));
-                bookStockTextField.setText(String.valueOf(selectedBook.getStock()));
+                setTextFieldValues(selectedBook);
             }
         });
     }
 
+    private <S, T> TableColumn<S, T> createTableColumn(String text, double width, String propertyName) {
+        TableColumn<S, T> column = new TableColumn<>(text);
+        column.setMinWidth(width);
+        column.setCellValueFactory(new PropertyValueFactory<>(propertyName));
+        return column;
+    }
+
+    private void setTextFieldValues(Book selectedBook) {
+        bookTitleTextField.setText(selectedBook.getTitle());
+        bookAuthorTextField.setText(selectedBook.getAuthor());
+        bookPublishedDateTextField.setText(String.valueOf(selectedBook.getPublishedDate()));
+        bookPriceTextField.setText(String.valueOf(selectedBook.getPrice()));
+        bookStockTextField.setText(String.valueOf(selectedBook.getStock()));
+    }
+
     private void initializeFixedFields() {
-        addBookToLibraryButton = new Button("Add book to library");
-        addBookToLibraryButton.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-        HBox addBookToLibraryButtonHBox = new HBox(10);
-        addBookToLibraryButtonHBox.setAlignment(Pos.BOTTOM_RIGHT);
-        addBookToLibraryButtonHBox.getChildren().add(addBookToLibraryButton);
-        gridPane.add(addBookToLibraryButtonHBox, 1, 11);
-
-        addOrderButton = new Button("Order book");
-        addOrderButton.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-        HBox addBookToCartButtonHBox = new HBox(10);
-        addBookToCartButtonHBox.setAlignment(Pos.BOTTOM_RIGHT);
-        addBookToCartButtonHBox.getChildren().add(addOrderButton);
-        gridPane.add(addBookToCartButtonHBox, 1, 9);
-
-        viewOrdersButton = new Button("View orders");
-        viewOrdersButton.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-        gridPane.add(viewOrdersButton, 1, 0);
-        GridPane.setHalignment(viewOrdersButton, HPos.RIGHT);
-
-        deleteBookFromLibrary = new Button("Delete book from library");
-        deleteBookFromLibrary.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-        HBox deleteBookFromLibraryButtonHBox = new HBox(10);
-        deleteBookFromLibraryButtonHBox.setAlignment(Pos.BOTTOM_RIGHT);
-        deleteBookFromLibraryButtonHBox.getChildren().add(deleteBookFromLibrary);
-        gridPane.add(deleteBookFromLibraryButtonHBox, 1, 12);
-
-        updateBookButton = new Button("Update book");
-        updateBookButton.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-        HBox updateBookButtonHbox = new HBox(10);
-        updateBookButtonHbox.setAlignment(Pos.BOTTOM_RIGHT);
-        updateBookButtonHbox.getChildren().add(updateBookButton);
-        gridPane.add(updateBookButtonHbox, 1, 10);
-
-        logOutButton = new Button("LogOut");
-        logOutButton.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-        gridPane.add(logOutButton, 0, 0);
-        GridPane.setHalignment(logOutButton, HPos.LEFT);
+        addBookToLibraryButton = createButton("Add book to library", 1, 11, Pos.BOTTOM_RIGHT);
+        addOrderButton = createButton("Order book", 1, 9, Pos.BOTTOM_RIGHT);
+        viewActivityButton = createButton("View activity", 1, 0, Pos.BOTTOM_RIGHT);
+        deleteBookFromLibrary = createButton("Delete book from library", 1, 12, Pos.BOTTOM_RIGHT);
+        updateBookButton = createButton("Update book", 1, 10, Pos.BOTTOM_RIGHT);
+        logOutButton = createButton("LogOut", 0, 0, Pos.BOTTOM_LEFT);
 
         actionTarget = new Text();
         actionTarget.setFill(Color.FIREBRICK);
@@ -174,72 +134,53 @@ public class EmployeeView {
         gridPane.add(actionTarget, 1, 14);
     }
 
+    private Button createButton(String text, int column, int row, Pos alignment) {
+        Button button = new Button(text);
+        button.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
+        HBox buttonHBox = new HBox(10);
+        buttonHBox.setAlignment(alignment);
+        buttonHBox.getChildren().add(button);
+        gridPane.add(buttonHBox, column, row);
+        return button;
+    }
+
     private void initializeVariableFields() {
-        Label bookTitleLabel = new Label("Title:");
-        bookTitleLabel.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-
-        bookTitleTextField = new TextField();
-        bookTitleTextField.setFont(Font.font("Tahome", FontWeight.NORMAL, 12));
-        bookTitleTextField.setPrefWidth(250);
-
-        HBox bookTitleBox = new HBox(10);
-        bookTitleBox.getChildren().addAll(bookTitleLabel, bookTitleTextField);
-
-        gridPane.add(bookTitleBox, 0, 8);
-
-        Label bookAuthorLabel = new Label("Author:");
-        bookAuthorLabel.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-
-        bookAuthorTextField = new TextField();
-        bookAuthorTextField.setFont(Font.font("Tahome", FontWeight.NORMAL, 12));
-        bookAuthorTextField.setPrefWidth(200);
-
-        HBox bookAuthorBox = new HBox(10);
-        bookAuthorBox.getChildren().addAll(bookAuthorLabel, bookAuthorTextField);
-
-        gridPane.add(bookAuthorBox, 0, 9);
-
-        Label bookPriceLabel = new Label("Price:");
-        bookPriceLabel.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-
-        bookPriceTextField = new TextField();
-        bookPriceTextField.setFont(Font.font("Tahome", FontWeight.NORMAL, 12));
-        bookPriceTextField.setPrefWidth(150);
-
-        HBox bookPriceBox = new HBox(10);
-        bookPriceBox.getChildren().addAll(bookPriceLabel, bookPriceTextField);
-
-        gridPane.add(bookPriceBox, 0, 10);
-
-        Label bookStockLabel = new Label("Stock/Quantity wanted:");
-        bookStockLabel.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-
-        bookStockTextField = new TextField();
-        bookStockTextField.setFont(Font.font("Tahome", FontWeight.NORMAL, 12));
-        bookStockTextField.setPrefWidth(150);
-
-        HBox bookStockBox = new HBox(10);
-        bookStockBox.getChildren().addAll(bookStockLabel, bookStockTextField);
-
-        gridPane.add(bookStockBox, 0, 11);
-
-        Label bookPublishedDateLabel = new Label("Published date:");
-        bookPublishedDateLabel.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
-
-        bookPublishedDateTextField = new TextField();
-        bookPublishedDateTextField.setFont(Font.font("Tahome", FontWeight.NORMAL, 12));
-        bookPublishedDateTextField.setMaxWidth(150);
-
-        HBox bookPublishedDateBox = new HBox(10);
-        bookPublishedDateBox.getChildren().addAll(bookPublishedDateLabel, bookPublishedDateTextField);
-
-        gridPane.add(bookPublishedDateBox, 0, 12);
+        bookTitleTextField = createTextField("Title:", 8, 250);
+        bookAuthorTextField = createTextField("Author:", 9, 200);
+        bookPriceTextField = createTextField("Price:", 10, 150);
+        bookStockTextField = createTextField("Stock/Quantity wanted:", 11, 150);
+        bookPublishedDateTextField = createTextField("Published date:", 12, 150);
 
         Label selectedClientLabel = new Label("Select client:");
         selectedClientLabel.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
 
         clientIdComboBox = new ComboBox<>();
-        List<Long> clientIDList = componentFactory.getUserRepository()
+        initializeClientIdComboBox();
+
+        HBox clientIDBox = new HBox(10);
+        clientIDBox.getChildren().addAll(selectedClientLabel, clientIdComboBox);
+
+        gridPane.add(clientIDBox, 0, 13);
+    }
+
+    private TextField createTextField(String label, int row, double width) {
+        Label titleLabel = new Label(label);
+        titleLabel.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
+
+        TextField textField = new TextField();
+        textField.setFont(Font.font("Tahome", FontWeight.NORMAL, 12));
+        textField.setPrefWidth(width);
+
+        HBox box = new HBox(10);
+        box.getChildren().addAll(titleLabel, textField);
+
+        gridPane.add(box, 0, row);
+
+        return textField;
+    }
+
+    private void initializeClientIdComboBox() {
+        List<Long> clientIDList = componentFactory.getUserService()
                 .findAll()
                 .stream()
                 .filter(user -> user.getRoles().stream().anyMatch(role -> role.getRole().equals(Constants.Roles.CUSTOMER)))
@@ -249,25 +190,27 @@ public class EmployeeView {
         ObservableList<Long> observableEmployeeIDList = FXCollections.observableArrayList(clientIDList);
         clientIdComboBox.setItems(observableEmployeeIDList);
         clientIdComboBox.setPrefWidth(100);
-
-        HBox clientIDBox = new HBox(10);
-        clientIDBox.getChildren().addAll(selectedClientLabel, clientIdComboBox);
-
-        gridPane.add(clientIDBox, 0, 13);
     }
 
     public ObservableList<Book> getBook() {
         ObservableList<Book> books = FXCollections.observableArrayList();
         books.addAll(componentFactory.getBookService().findAll());
 
-        books.forEach(book -> {
-            book.setAge(componentFactory.getBookService().getAgeOfBook(book.getId()));
-        });
+        books.forEach(book -> book.setAge(componentFactory.getBookService().getAgeOfBook(book.getId())));
         return books;
     }
 
     public void addRecordsToTable() {
         bookTable.setItems(getBook());
+    }
+
+    public void clearFields() {
+        bookTitleTextField.clear();
+        bookAuthorTextField.clear();
+        bookPublishedDateTextField.clear();
+        bookPriceTextField.clear();
+        bookStockTextField.clear();
+        clientIdComboBox.getSelectionModel().clearSelection();
     }
 
     public void addBookToLibraryButtonListener(EventHandler<ActionEvent> addBookToLibraryButtonListener) {
@@ -278,8 +221,8 @@ public class EmployeeView {
         addOrderButton.setOnAction(orderBookButtonListener);
     }
 
-    public void addViewOrdersButtonListener(EventHandler<ActionEvent> viewOrdersButtonListener) {
-        viewOrdersButton.setOnAction(viewOrdersButtonListener);
+    public void addViewActivityButtonListener(EventHandler<ActionEvent> viewActivityButtonListener) {
+        viewActivityButton.setOnAction(viewActivityButtonListener);
     }
 
     public void addDeleteBookFromLibraryButtonListener(EventHandler<ActionEvent> deleteBookFromLibraryButtonListener) {

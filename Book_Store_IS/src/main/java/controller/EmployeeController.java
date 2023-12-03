@@ -32,7 +32,7 @@ public class EmployeeController {
 
         this.employeeView.addBookToLibraryButtonListener(new AddBookToLibraryButtonListener());
         this.employeeView.addOrderButtonListener(new AddOrderButtonListener());
-        this.employeeView.addViewOrdersButtonListener(new ViewOrdersButtonListener());
+        this.employeeView.addViewActivityButtonListener(new ViewActivityButtonListener());
         this.employeeView.addDeleteBookFromLibraryButtonListener(new DeleteBookFromLibraryButtonListener());
         this.employeeView.addUpdateBookButtonListener(new UpdateBookButtonListener());
         this.employeeView.addLogOutButtonListener(new LogOutButtonListener());
@@ -64,6 +64,7 @@ public class EmployeeController {
                 employeeView.setActionTargetText("Added to library successfully!");
             }
             employeeView.addRecordsToTable();
+            employeeView.clearFields();
         }
     }
 
@@ -94,11 +95,12 @@ public class EmployeeController {
                     employeeView.setActionTargetText("Bought book successfully!");
                 }
                 employeeView.addRecordsToTable();
+                employeeView.clearFields();
             }
         }
     }
 
-    private class ViewOrdersButtonListener implements EventHandler<ActionEvent> {
+    private class ViewActivityButtonListener implements EventHandler<ActionEvent> {
 
         @Override
         public void handle(ActionEvent event) {
@@ -106,7 +108,6 @@ public class EmployeeController {
             try {
                 PdfWriter.getInstance(document, new FileOutputStream("EmployeeActivity.pdf"));
                 document.open();
-                Font font = FontFactory.getFont(FontFactory.COURIER, 16, BaseColor.BLACK);
 
                 PdfPTable table = new PdfPTable(6);
                 addTableHeader(table);
@@ -114,15 +115,19 @@ public class EmployeeController {
 
                 document.add(table);
                 document.close();
-            } catch (DocumentException e) {
-                throw new RuntimeException(e);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            } catch (DocumentException | FileNotFoundException e) {
+                e.printStackTrace();
             }
+            employeeView.setActionTargetText("Generated PDF successfully!");
         }
 
-        private void addTableHeader(PdfPTable table) {
-            Stream.of("id", "employee_id", "customer_id", "book_id", "quantity", "price")
+        private void addTableHeader(PdfPTable table) throws DocumentException {
+            float[] columnWidths = {50f, 80f, 80f, 200f, 70f, 70f};
+
+            table.setTotalWidth(columnWidths);
+            table.setLockedWidth(true);
+
+            Stream.of("id", "customer_id", "book_id", "book_title", "quantity", "price")
                     .forEach(columnTitle -> {
                         PdfPCell header = new PdfPCell();
                         header.setBackgroundColor(BaseColor.LIGHT_GRAY);
@@ -136,9 +141,9 @@ public class EmployeeController {
             List<Command> commands = componentFactory.getCommandService().findByEmployeeId(user.getId());
             for(Command command: commands) {
                 table.addCell(command.getId().toString());
-                table.addCell(command.getEmployeeId().toString());
                 table.addCell(command.getCustomerId().toString());
                 table.addCell(command.getBookId().toString());
+                table.addCell(componentFactory.getBookService().findById(command.getBookId()).get().getTitle());
                 table.addCell(command.getQuantity().toString());
                 table.addCell(String.format("%.2f", command.getPrice()));
             }
@@ -153,6 +158,7 @@ public class EmployeeController {
             componentFactory.getBookService().removeBook(selectedBook);
             employeeView.setActionTargetText("Deleted from library successfully!");
             employeeView.addRecordsToTable();
+            employeeView.clearFields();
         }
     }
 
@@ -171,6 +177,7 @@ public class EmployeeController {
                 employeeView.setActionTargetText("Book updated successfully!");
             }
             employeeView.addRecordsToTable();
+            employeeView.clearFields();
         }
     }
 

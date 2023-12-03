@@ -29,15 +29,14 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CustomerView {
-    private Stage customerStage;
-    private ComponentFactory componentFactory;
-    private GridPane gridPane;
+    private final Stage customerStage;
+    private final ComponentFactory componentFactory;
+    private final GridPane gridPane;
     private TableView<Book> bookTable;
     private TextField selectedBookTextField;
     private Spinner<Integer> quantitySpinner;
     private ComboBox<Long> employeeComboBox;
     private Button buyBookButton;
-    private Button viewOrdersButton;
     private Button logOutButton;
     private Text actionTarget;
 
@@ -79,33 +78,13 @@ public class CustomerView {
     }
 
     private void initializeTable() {
-        TableColumn<Book, String> idBook = new TableColumn<>("ID");
-        idBook.setMinWidth(40);
-        idBook.setCellValueFactory(new PropertyValueFactory<>("id"));
-
-        TableColumn<Book, String> authorBook = new TableColumn<>("Author");
-        authorBook.setMinWidth(200);
-        authorBook.setCellValueFactory(new PropertyValueFactory<>("author"));
-
-        TableColumn<Book, String> titleBook = new TableColumn<>("Title");
-        titleBook.setMinWidth(200);
-        titleBook.setCellValueFactory(new PropertyValueFactory<>("title"));
-
-        TableColumn<Book, LocalDate> publishedDateBook = new TableColumn<>("Published Date");
-        publishedDateBook.setMinWidth(200);
-        publishedDateBook.setCellValueFactory(new PropertyValueFactory<>("publishedDate"));
-
-        TableColumn<Book, Double> priceBook = new TableColumn<>("Price");
-        priceBook.setMinWidth(125);
-        priceBook.setCellValueFactory(new PropertyValueFactory<>("price"));
-
-        TableColumn<Book, Integer> stockBook = new TableColumn<>("Stock");
-        stockBook.setMinWidth(100);
-        stockBook.setCellValueFactory(new PropertyValueFactory<>("stock"));
-
-        TableColumn<Book, Integer> ageOfBook = new TableColumn<>("Age");
-        ageOfBook.setMinWidth(40);
-        ageOfBook.setCellValueFactory(new PropertyValueFactory<>("age"));
+        TableColumn<Book, String> idBook = createTableColumn("ID", 40, "id");
+        TableColumn<Book, String> authorBook = createTableColumn("Author", 200, "author");
+        TableColumn<Book, String> titleBook = createTableColumn("Title", 200, "title");
+        TableColumn<Book, LocalDate> publishedDateBook = createTableColumn("Published Date", 200, "publishedDate");
+        TableColumn<Book, Double> priceBook = createTableColumn("Price", 125, "price");
+        TableColumn<Book, Integer> stockBook = createTableColumn("Stock", 100, "stock");
+        TableColumn<Book, Integer> ageOfBook = createTableColumn("Age", 40, "age");
 
         bookTable = new TableView<>();
         addRecordsToTable();
@@ -113,11 +92,18 @@ public class CustomerView {
         gridPane.add(bookTable, 0, 2, 2, 1);
 
         bookTable.setOnMouseClicked((MouseEvent event) -> {
-            Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
+            Book selectedBook = getSelectedBook();
             if (selectedBook != null) {
                 selectedBookTextField.setText(selectedBook.getTitle());
             }
         });
+    }
+
+    private <S, T> TableColumn<S, T> createTableColumn(String text, double width, String propertyName) {
+        TableColumn<S, T> column = new TableColumn<>(text);
+        column.setMinWidth(width);
+        column.setCellValueFactory(new PropertyValueFactory<>(propertyName));
+        return column;
     }
 
     private ObservableList<Book> getBook() {
@@ -125,9 +111,7 @@ public class CustomerView {
         books.addAll(componentFactory.getBookService().findAll());
         books.removeIf(book -> book.getStock() == 0);
 
-        books.forEach(book -> {
-            book.setAge(componentFactory.getBookService().getAgeOfBook(book.getId()));
-        });
+        books.forEach(book -> book.setAge(componentFactory.getBookService().getAgeOfBook(book.getId())));
         return books;
     }
 
@@ -136,78 +120,95 @@ public class CustomerView {
     }
 
     private void initializeVariableFields() {
-        Font labelFont = Font.font("Tahome", FontWeight.NORMAL, 14);
-        Font textFieldFont = Font.font("Tahome", FontWeight.NORMAL, 12);
+        selectedBookTextField = createTextField(Font.font("Tahome", FontWeight.NORMAL, 14), Font.font("Tahome", FontWeight.NORMAL, 12));
+        quantitySpinner = createSpinner(Font.font("Tahome", FontWeight.NORMAL, 14), Font.font("Tahome", FontWeight.NORMAL, 12));
+        employeeComboBox = createComboBox(Font.font("Tahome", FontWeight.NORMAL, 14), getEmployeeIDList());
+    }
 
-        Label selectedBookLabel = new Label("Book Title:");
-        selectedBookLabel.setFont(labelFont);
+    private TextField createTextField(Font labelFont, Font textFieldFont) {
+        Label titleLabel = new Label("Book Title:");
+        titleLabel.setFont(labelFont);
 
-        selectedBookTextField = new TextField();
-        selectedBookTextField.setEditable(false);
-        selectedBookTextField.setFont(textFieldFont);
-        selectedBookTextField.setPrefWidth(200);
+        TextField textField = new TextField();
+        textField.setFont(textFieldFont);
+        textField.setPrefWidth(200);
 
-        HBox selectedBookBox = createHBoxWithSpacing(10, selectedBookLabel, selectedBookTextField);
-        gridPane.add(selectedBookBox, 0, 4);
+        HBox box = createHBoxWithSpacing(titleLabel, textField);
+        gridPane.add(box, 0, 4);
 
-        Label selectedQuantityLabel = new Label("Select Quantity:");
-        selectedQuantityLabel.setFont(labelFont);
+        return textField;
+    }
 
-        quantitySpinner = new Spinner<>(1, 100, 1);
-        quantitySpinner.setEditable(true);
-        quantitySpinner.setPrefWidth(120);
+    private Spinner<Integer> createSpinner(Font labelFont, Font spinnerFont) {
+        Label titleLabel = new Label("Select Quantity:");
+        titleLabel.setFont(labelFont);
 
-        HBox selectedQuantityBox = createHBoxWithSpacing(10, selectedQuantityLabel, quantitySpinner);
-        gridPane.add(selectedQuantityBox, 0, 5);
+        Spinner<Integer> spinner = new Spinner<>(1, 100, 1);
+        spinner.setEditable(true);
+        spinner.setPrefWidth(120);
+        spinner.getEditor().setFont(spinnerFont);
 
-        Label selectedEmployeeLabel = new Label("Select Employee:");
-        selectedEmployeeLabel.setFont(labelFont);
+        HBox box = createHBoxWithSpacing(titleLabel, spinner);
+        gridPane.add(box, 0, 5);
 
-        employeeComboBox = new ComboBox<>();
-        List<Long> employeeIDList = componentFactory.getUserRepository()
+        return spinner;
+    }
+
+    private ComboBox<Long> createComboBox(Font labelFont, List<Long> items) {
+        Label titleLabel = new Label("Select Employee:");
+        titleLabel.setFont(labelFont);
+
+        ComboBox<Long> comboBox = new ComboBox<>();
+        ObservableList<Long> observableList = FXCollections.observableArrayList(items);
+        comboBox.setItems(observableList);
+        comboBox.setPrefWidth(100);
+
+        HBox box = createHBoxWithSpacing(titleLabel, comboBox);
+        gridPane.add(box, 0, 6);
+
+        return comboBox;
+    }
+
+    private List<Long> getEmployeeIDList() {
+        return componentFactory.getUserService()
                 .findAll()
                 .stream()
                 .filter(user -> user.getRoles().stream().anyMatch(role -> role.getRole().equals(Constants.Roles.EMPLOYEE)))
                 .map(User::getId)
                 .toList();
-
-        ObservableList<Long> observableEmployeeIDList = FXCollections.observableArrayList(employeeIDList);
-        employeeComboBox.setItems(observableEmployeeIDList);
-        employeeComboBox.setPrefWidth(100);
-
-        HBox employeeIDBox = createHBoxWithSpacing(10, selectedEmployeeLabel, employeeComboBox);
-        gridPane.add(employeeIDBox, 0, 6);
     }
 
-    private HBox createHBoxWithSpacing(int spacing, Node... nodes) {
-        HBox hBox = new HBox(spacing);
+    private HBox createHBoxWithSpacing(Node... nodes) {
+        HBox hBox = new HBox(10);
         hBox.getChildren().addAll(nodes);
         return hBox;
     }
 
     private void initializeFixedFields() {
-        Font font = Font.font("Tahome", FontWeight.NORMAL, 14);
-
-        buyBookButton = new Button("Buy Book");
-        buyBookButton.setFont(font);
-        gridPane.add(buyBookButton, 1, 6);
-        GridPane.setHalignment(buyBookButton, HPos.RIGHT);
-
-        logOutButton = new Button("LogOut");
-        logOutButton.setFont(font);
-        gridPane.add(logOutButton, 0, 0);
-        GridPane.setHalignment(logOutButton, HPos.LEFT);
-
-        viewOrdersButton = new Button("View Orders");
-        viewOrdersButton.setFont(font);
-        gridPane.add(viewOrdersButton, 1, 0);
-        GridPane.setHalignment(viewOrdersButton, HPos.RIGHT);
+        buyBookButton = createButton("Buy Book", 1, 6, Pos.BOTTOM_RIGHT);
+        logOutButton = createButton("LogOut", 0, 0, Pos.BOTTOM_LEFT);
 
         actionTarget = new Text();
         actionTarget.setFill(Color.FIREBRICK);
-        actionTarget.setFont(font);
+        actionTarget.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
         gridPane.add(actionTarget, 1, 6);
         GridPane.setHalignment(actionTarget, HPos.CENTER);
+    }
+
+    private Button createButton(String text, int column, int row, Pos alignment) {
+        Button button = new Button(text);
+        button.setFont(Font.font("Tahome", FontWeight.NORMAL, 14));
+        HBox buttonHBox = new HBox(10);
+        buttonHBox.setAlignment(alignment);
+        buttonHBox.getChildren().add(button);
+        gridPane.add(buttonHBox, column, row);
+        return button;
+    }
+
+    public void clearFields() {
+        selectedBookTextField.clear();
+        quantitySpinner.getValueFactory().setValue(1);
+        employeeComboBox.getSelectionModel().clearSelection();
     }
 
     public Spinner<Integer> getQuantitySpinner() {
@@ -216,10 +217,6 @@ public class CustomerView {
 
     public void addBuyButtonListener(EventHandler<ActionEvent> buyButtonListener) {
         buyBookButton.setOnAction(buyButtonListener);
-    }
-
-    public void addViewOrdersButtonListener(EventHandler<ActionEvent> viewOrderButtonListener) {
-        viewOrdersButton.setOnAction(viewOrderButtonListener);
     }
 
     public void addLogOutButtonListener(EventHandler<ActionEvent> logOutButtonListener) {

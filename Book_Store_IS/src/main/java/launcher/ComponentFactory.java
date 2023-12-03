@@ -14,6 +14,8 @@ import service.book.BookService;
 import service.book.BookServiceImpl;
 import service.command.CommandService;
 import service.command.CommandServiceImpl;
+import service.security.RightsRolesService;
+import service.security.RightsRolesServiceImpl;
 import service.user.AuthenticationService;
 import service.user.AuthenticationServiceImpl;
 import service.user.UserService;
@@ -33,6 +35,7 @@ public class ComponentFactory {
     private final BookService bookService;
     private final UserService userService;
     private final CommandService commandService;
+    private final RightsRolesService rightsRolesService;
     private static volatile ComponentFactory instance;
 
     public static ComponentFactory getInstance(Boolean componentsForTests, Stage stage) {
@@ -58,22 +61,11 @@ public class ComponentFactory {
         this.userService = new UserServiceImpl(userRepository, rightsRolesRepository);
         this.commandRepository = new CommandRepositoryMySQL(connection);
         this.commandService = new CommandServiceImpl(commandRepository);
+        this.rightsRolesService = new RightsRolesServiceImpl(rightsRolesRepository);
     }
 
     public LoginView getLoginView() {
         return loginView;
-    }
-
-    public UserRepository getUserRepository() {
-        return userRepository;
-    }
-
-    public RightsRolesRepository getRightsRolesRepository() {
-        return rightsRolesRepository;
-    }
-
-    public BookRepositoryMySQL getBookRepository() {
-        return bookRepository;
     }
 
     public AuthenticationService getAuthenticationService() {
@@ -90,5 +82,8 @@ public class ComponentFactory {
 
     public CommandService getCommandService() {
         return commandService;
+    }
+    public RightsRolesService getRightsRolesService() {
+        return rightsRolesService;
     }
 }

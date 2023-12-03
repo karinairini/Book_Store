@@ -2,14 +2,11 @@ package controller;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.stage.Stage;
 import launcher.ComponentFactory;
 import model.Book;
 import model.Command;
 import model.User;
-import model.builder.BookBuilder;
 import model.builder.CommandBuilder;
-import model.validator.Notification;
 import view.CustomerView;
 
 
@@ -24,7 +21,6 @@ public class CustomerController {
         this.user = user;
 
         this.customerView.addBuyButtonListener(new BuyButtonListener());
-        this.customerView.addViewOrdersButtonListener(new ViewOrdersButtonListener());
         this.customerView.addLogOutButtonListener(new LogOutButtonListener());
     }
 
@@ -55,15 +51,8 @@ public class CustomerController {
                     customerView.setActionTargetText("Bought book successfully!");
                 }
                 customerView.addRecordsToTable();
+                customerView.clearFields();
             }
-        }
-    }
-
-    private class ViewOrdersButtonListener implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-
         }
     }
 

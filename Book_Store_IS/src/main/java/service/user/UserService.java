@@ -29,6 +29,4 @@ public interface UserService {
     void remove(Long id);
 
     void removeAll();
-
-    String getSaltByUsername(String username);
 }

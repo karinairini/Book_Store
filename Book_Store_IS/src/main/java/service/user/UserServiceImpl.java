@@ -72,9 +72,4 @@ public class UserServiceImpl implements UserService {
     public void removeAll() {
         userRepository.removeAll();
     }
-
-    @Override
-    public String getSaltByUsername(String username) {
-        return userRepository.getSaltByUsername(username);
-    }
 }

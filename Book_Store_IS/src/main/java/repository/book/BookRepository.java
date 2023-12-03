@@ -1,8 +1,6 @@
 package repository.book;
 
 import model.Book;
-import model.validator.Notification;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +16,5 @@ public interface BookRepository {
 
     void removeAll();
 
-    //asta nuj daca e ok
     boolean updateBook(Book book, boolean buy);
 }

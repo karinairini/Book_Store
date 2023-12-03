@@ -41,6 +41,7 @@ public class CommandRepositoryMySQL implements CommandRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, employeeId);
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -60,6 +61,7 @@ public class CommandRepositoryMySQL implements CommandRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1, customerId);
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -117,7 +119,6 @@ public class CommandRepositoryMySQL implements CommandRepository {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

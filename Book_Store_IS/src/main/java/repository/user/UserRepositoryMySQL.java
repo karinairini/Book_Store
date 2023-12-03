@@ -81,8 +81,6 @@ public class UserRepositoryMySQL implements UserRepository {
         return Optional.empty();
     }
 
-
-    //Metoda reimplementata fara SQL injection
     @Override
     public Notification<User> findByUsernameAndPassword(String username, String password) {
         String sql = "SELECT * FROM user WHERE username = ? AND password = ?;";
